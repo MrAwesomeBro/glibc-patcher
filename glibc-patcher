@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Script to install icinga2 from debmon repositories
+# 16.02.2016 - Denis Walther
+
+# Check if script is runned by root:
+if (( $EUID != 0 )); then
+	echo ""
+	echo -e "Please run as root! Exiting.."
+	echo ""
+   	exit 1
+fi
+
+# Grep distribution:
+distro=`cat /etc/os-release | grep -oh 'jessie\|wheezy' | uniq ; cat /etc/os-release | grep -oh 'CentOS\|7\|6' | tr '\n' ' ' | grep -oh 'CentOS 7\|CentOS 6' | uniq`
+
+# Check Distribution and install updates:
+deb=`apt-get update && apt-get install libc-bin libc-dev-bin libc6 libc6-dev -y`
+cent=`yum update && yum install glibc glibc-devel`
+
+if [ "$distro" = "wheezy" ]; then
+	$deb
+elif [ "$distro" = "jessie" ]; then
+	$deb
+elif [ "$distro" = "CentOS 6" ]; then
+	$cent
+elif [ "$distro" = "CentOS 7" ]; then
+	$cent
+else
+	echo "invalid distribution"
+	exit 1
+fi
+
+# Final echo:
+echo "Done successfully!"
+echo ""
+echo "You need to run 'shutdown -r now' so your memory is cleaned for sure!"
+echo ""
+
